@@ -294,3 +294,13 @@ sai_object_type_t sai_object_type_query(_In_ sai_object_id_t sai_object_id)
         return SAI_OBJECT_TYPE_NULL;
     }
 }
+
+sai_object_id_t sai_switch_id_query(_In_ sai_object_id_t sai_object_id)
+{
+    return 0;
+}
+
+sai_status_t sai_dbg_generate_dump(_In_ const char *dump_file_name)
+{
+    return SAI_STATUS_NOT_SUPPORTED;
+}
