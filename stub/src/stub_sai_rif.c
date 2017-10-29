@@ -127,6 +127,7 @@ static void rif_key_to_str(_In_ sai_object_id_t rif_id, _Out_ char *key_str)
  *    Failure status code on error
  */
 sai_status_t stub_create_router_interface(_Out_ sai_object_id_t* rif_id,
+                                          _In_ sai_object_id_t switch_id,
                                           _In_ uint32_t          attr_count,
                                           _In_ const sai_attribute_t  *attr_list)
 {
@@ -251,7 +252,7 @@ sai_status_t stub_remove_router_interface(_In_ sai_object_id_t rif_id)
  */
 sai_status_t stub_set_router_interface_attribute(_In_ sai_object_id_t rif_id, _In_ const sai_attribute_t *attr)
 {
-    const sai_object_key_t key = { .object_id = rif_id };
+    const sai_object_key_t key = { .key = { .object_id = rif_id} };
     char                   key_str[MAX_KEY_STR_LEN];
 
     STUB_LOG_ENTER();
@@ -277,7 +278,7 @@ sai_status_t stub_get_router_interface_attribute(_In_ sai_object_id_t     rif_id
                                                  _In_ uint32_t            attr_count,
                                                  _Inout_ sai_attribute_t *attr_list)
 {
-    const sai_object_key_t key = { .object_id = rif_id };
+    const sai_object_key_t key = { .key = { .object_id = rif_id} };
     char                   key_str[MAX_KEY_STR_LEN];
 
     STUB_LOG_ENTER();
@@ -299,7 +300,7 @@ sai_status_t stub_rif_attrib_set(_In_ const sai_object_key_t *key, _In_ const sa
            (SAI_ROUTER_INTERFACE_ATTR_SRC_MAC_ADDRESS == (int64_t)arg));
 
     if (SAI_STATUS_SUCCESS !=
-        (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_ROUTER_INTERFACE, &data))) {
+        (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_ROUTER_INTERFACE, &data))) {
         return status;
     }
 
@@ -319,7 +320,7 @@ sai_status_t stub_rif_admin_set(_In_ const sai_object_key_t *key, _In_ const sai
            (SAI_ROUTER_INTERFACE_ATTR_ADMIN_V6_STATE == (int64_t)arg));
 
     if (SAI_STATUS_SUCCESS !=
-        (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_ROUTER_INTERFACE, &data))) {
+        (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_ROUTER_INTERFACE, &data))) {
         return status;
     }
 
@@ -351,7 +352,7 @@ sai_status_t stub_rif_attrib_get(_In_ const sai_object_key_t   *key,
            (SAI_ROUTER_INTERFACE_ATTR_MTU == (int64_t)arg));
 
     if (SAI_STATUS_SUCCESS !=
-        (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_ROUTER_INTERFACE, &data))) {
+        (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_ROUTER_INTERFACE, &data))) {
         return status;
     }
 
@@ -405,7 +406,7 @@ sai_status_t stub_rif_admin_get(_In_ const sai_object_key_t   *key,
            (SAI_ROUTER_INTERFACE_ATTR_ADMIN_V6_STATE == (int64_t)arg));
 
     if (SAI_STATUS_SUCCESS !=
-        (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_ROUTER_INTERFACE, &data))) {
+        (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_ROUTER_INTERFACE, &data))) {
         return status;
     }
 

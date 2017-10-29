@@ -23,9 +23,9 @@
 #define __MODULE__ SAI_NEIGHBOR
 
 static const sai_attribute_entry_t neighbor_attribs[] = {
-    { SAI_NEIGHBOR_ATTR_DST_MAC_ADDRESS, true, true, true, true,
+    { SAI_NEIGHBOR_ENTRY_ATTR_DST_MAC_ADDRESS, true, true, true, true,
       "Neighbor destination MAC", SAI_ATTR_VAL_TYPE_MAC },
-    { SAI_NEIGHBOR_ATTR_PACKET_ACTION, false, true, true, true,
+    { SAI_NEIGHBOR_ENTRY_ATTR_PACKET_ACTION, false, true, true, true,
       "Neighbor L3 forwarding action", SAI_ATTR_VAL_TYPE_S32 },
     { END_FUNCTIONALITY_ATTRIBS_ID, false, false, false, false,
       "", SAI_ATTR_VAL_TYPE_UNDETERMINED }
@@ -49,12 +49,12 @@ sai_status_t stub_neighbor_action_set(_In_ const sai_object_key_t      *key,
                                       void                             *arg);
 
 static const sai_vendor_attribute_entry_t neighbor_vendor_attribs[] = {
-    { SAI_NEIGHBOR_ATTR_DST_MAC_ADDRESS,
+    { SAI_NEIGHBOR_ENTRY_ATTR_DST_MAC_ADDRESS,
       { true, false, true, true },
       { true, false, true, true },
       stub_neighbor_mac_get, NULL,
       stub_neighbor_mac_set, NULL },
-    { SAI_NEIGHBOR_ATTR_PACKET_ACTION,
+    { SAI_NEIGHBOR_ENTRY_ATTR_PACKET_ACTION,
       { true, false, true, true },
       { true, false, true, true },
       stub_neighbor_action_get, NULL,
@@ -173,7 +173,7 @@ sai_status_t stub_remove_neighbor_entry(_In_ const sai_neighbor_entry_t* neighbo
 sai_status_t stub_set_neighbor_attribute(_In_ const sai_neighbor_entry_t* neighbor_entry,
                                          _In_ const sai_attribute_t      *attr)
 {
-    const sai_object_key_t key = { .neighbor_entry = neighbor_entry };
+    const sai_object_key_t key = { .key = {.neighbor_entry = *neighbor_entry }};
     char                   key_str[MAX_KEY_STR_LEN];
 
     STUB_LOG_ENTER();
@@ -204,7 +204,7 @@ sai_status_t stub_get_neighbor_attribute(_In_ const sai_neighbor_entry_t* neighb
                                          _In_ uint32_t                    attr_count,
                                          _Inout_ sai_attribute_t         *attr_list)
 {
-    const sai_object_key_t key = { .neighbor_entry = neighbor_entry };
+    const sai_object_key_t key = { .key = {.neighbor_entry = *neighbor_entry }};
     char                   key_str[MAX_KEY_STR_LEN];
 
     STUB_LOG_ENTER();
@@ -279,7 +279,7 @@ sai_status_t stub_neighbor_action_set(_In_ const sai_object_key_t      *key,
  *    SAI_STATUS_SUCCESS on success
  *    Failure status code on error
  */
-sai_status_t stub_remove_all_neighbor_entries(void)
+sai_status_t stub_remove_all_neighbor_entries(_In_ sai_object_id_t switch_id)
 {
     STUB_LOG_ENTER();
 

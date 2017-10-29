@@ -22,11 +22,11 @@
 #define __MODULE__ SAI_ROUTE
 
 static const sai_attribute_entry_t route_attribs[] = {
-    { SAI_ROUTE_ATTR_PACKET_ACTION, false, true, true, true,
+    { SAI_ROUTE_ENTRY_ATTR_PACKET_ACTION, false, true, true, true,
       "Route packet action", SAI_ATTR_VAL_TYPE_S32 },
-    { SAI_ROUTE_ATTR_TRAP_PRIORITY, false, true, true, true,
+    { SAI_HOSTIF_TRAP_ATTR_TRAP_PRIORITY, false, true, true, true,
       "Route trap priority", SAI_ATTR_VAL_TYPE_U8 },
-    { SAI_ROUTE_ATTR_NEXT_HOP_ID, false, true, true, true,
+    { SAI_ROUTE_ENTRY_ATTR_NEXT_HOP_ID, false, true, true, true,
       "Route next hop ID", SAI_ATTR_VAL_TYPE_OID },
     { END_FUNCTIONALITY_ATTRIBS_ID, false, false, false, false,
       "", SAI_ATTR_VAL_TYPE_UNDETERMINED }
@@ -58,28 +58,28 @@ sai_status_t stub_route_next_hop_id_set(_In_ const sai_object_key_t      *key,
                                         void                             *arg);
 
 static const sai_vendor_attribute_entry_t route_vendor_attribs[] = {
-    { SAI_ROUTE_ATTR_PACKET_ACTION,
+    { SAI_ROUTE_ENTRY_ATTR_PACKET_ACTION,
       { true, false, true, true },
       { true, false, true, true },
       stub_route_packet_action_get, NULL,
       stub_route_packet_action_set, NULL },
-    { SAI_ROUTE_ATTR_TRAP_PRIORITY,
+    { SAI_HOSTIF_TRAP_ATTR_TRAP_PRIORITY,
       { true, false, true, true },
       { true, false, true, true },
       stub_route_trap_priority_get, NULL,
       stub_route_trap_priority_set, NULL },
-    { SAI_ROUTE_ATTR_NEXT_HOP_ID,
+    { SAI_ROUTE_ENTRY_ATTR_NEXT_HOP_ID,
       { true, false, true, true },
       { true, false, true, true },
       stub_route_next_hop_id_get, NULL,
       stub_route_next_hop_id_set, NULL },
 };
-static void route_key_to_str(_In_ const sai_unicast_route_entry_t* unicast_route_entry, _Out_ char *key_str)
+static void route_key_to_str(_In_ const sai_route_entry_t* route_entry, _Out_ char *key_str)
 {
     int res;
 
     res = snprintf(key_str, MAX_KEY_STR_LEN, "route ");
-    sai_ipprefix_to_str(unicast_route_entry->destination, MAX_KEY_STR_LEN - res, key_str + res);
+    sai_ipprefix_to_str(route_entry->destination, MAX_KEY_STR_LEN - res, key_str + res);
 }
 
 /*
@@ -87,7 +87,7 @@ static void route_key_to_str(_In_ const sai_unicast_route_entry_t* unicast_route
  *    Create Route
  *
  * Arguments:
- *    [in] unicast_route_entry - route entry
+ *    [in] route_entry - route entry
  *    [in] attr_count - number of attributes
  *    [in] attr_list - array of attributes
  *
@@ -98,7 +98,7 @@ static void route_key_to_str(_In_ const sai_unicast_route_entry_t* unicast_route
  * Note: IP prefix/mask expected in Network Byte Order.
  *
  */
-sai_status_t stub_create_route(_In_ const sai_unicast_route_entry_t* unicast_route_entry,
+sai_status_t stub_create_route(_In_ const sai_route_entry_t* route_entry,
                                _In_ uint32_t                         attr_count,
                                _In_ const sai_attribute_t           *attr_list)
 {
@@ -108,8 +108,8 @@ sai_status_t stub_create_route(_In_ const sai_unicast_route_entry_t* unicast_rou
 
     STUB_LOG_ENTER();
 
-    if (NULL == unicast_route_entry) {
-        STUB_LOG_ERR("NULL unicast_route_entry param\n");
+    if (NULL == route_entry) {
+        STUB_LOG_ERR("NULL route_entry param\n");
         return SAI_STATUS_INVALID_PARAMETER;
     }
 
@@ -121,7 +121,7 @@ sai_status_t stub_create_route(_In_ const sai_unicast_route_entry_t* unicast_rou
         return status;
     }
 
-    route_key_to_str(unicast_route_entry, key_str);
+    route_key_to_str(route_entry, key_str);
     sai_attr_list_to_str(attr_count, attr_list, route_attribs, MAX_LIST_VALUE_STR_LEN, list_str);
     STUB_LOG_NTC("Create route %s\n", key_str);
     STUB_LOG_NTC("Attribs %s\n", list_str);
@@ -135,7 +135,7 @@ sai_status_t stub_create_route(_In_ const sai_unicast_route_entry_t* unicast_rou
  *    Remove Route
  *
  * Arguments:
- *    [in] unicast_route_entry - route entry
+ *    [in] route_entry - route entry
  *
  * Return Values:
  *    SAI_STATUS_SUCCESS on success
@@ -143,18 +143,18 @@ sai_status_t stub_create_route(_In_ const sai_unicast_route_entry_t* unicast_rou
  *
  * Note: IP prefix/mask expected in Network Byte Order.
  */
-sai_status_t stub_remove_route(_In_ const sai_unicast_route_entry_t* unicast_route_entry)
+sai_status_t stub_remove_route(_In_ const sai_route_entry_t* route_entry)
 {
     char key_str[MAX_KEY_STR_LEN];
 
     STUB_LOG_ENTER();
 
-    if (NULL == unicast_route_entry) {
-        STUB_LOG_ERR("NULL unicast_route_entry param\n");
+    if (NULL == route_entry) {
+        STUB_LOG_ERR("NULL route_entry param\n");
         return SAI_STATUS_INVALID_PARAMETER;
     }
 
-    route_key_to_str(unicast_route_entry, key_str);
+    route_key_to_str(route_entry, key_str);
     STUB_LOG_NTC("Remove route %s\n", key_str);
 
     STUB_LOG_EXIT();
@@ -166,27 +166,27 @@ sai_status_t stub_remove_route(_In_ const sai_unicast_route_entry_t* unicast_rou
  *    Set route attribute value
  *
  * Arguments:
- *    [in] unicast_route_entry - route entry
+ *    [in] route_entry - route entry
  *    [in] attr - attribute
  *
  * Return Values:
  *    SAI_STATUS_SUCCESS on success
  *    Failure status code on error
  */
-sai_status_t stub_set_route_attribute(_In_ const sai_unicast_route_entry_t* unicast_route_entry,
+sai_status_t stub_set_route_attribute(_In_ const sai_route_entry_t* route_entry,
                                       _In_ const sai_attribute_t           *attr)
 {
-    const sai_object_key_t key = { .unicast_route_entry = unicast_route_entry };
+    const sai_object_key_t key = { .key = { .route_entry = *route_entry } };
     char                   key_str[MAX_KEY_STR_LEN];
 
     STUB_LOG_ENTER();
 
-    if (NULL == unicast_route_entry) {
-        STUB_LOG_ERR("NULL unicast_route_entry param\n");
+    if (NULL == route_entry) {
+        STUB_LOG_ERR("NULL route_entry param\n");
         return SAI_STATUS_INVALID_PARAMETER;
     }
 
-    route_key_to_str(unicast_route_entry, key_str);
+    route_key_to_str(route_entry, key_str);
     return sai_set_attribute(&key, key_str, route_attribs, route_vendor_attribs, attr);
 }
 
@@ -195,7 +195,7 @@ sai_status_t stub_set_route_attribute(_In_ const sai_unicast_route_entry_t* unic
  *    Get route attribute value
  *
  * Arguments:
- *    [in] unicast_route_entry - route entry
+ *    [in] route_entry - route entry
  *    [in] attr_count - number of attributes
  *    [inout] attr_list - array of attributes
  *
@@ -203,21 +203,21 @@ sai_status_t stub_set_route_attribute(_In_ const sai_unicast_route_entry_t* unic
  *    SAI_STATUS_SUCCESS on success
  *    Failure status code on error
  */
-sai_status_t stub_get_route_attribute(_In_ const sai_unicast_route_entry_t* unicast_route_entry,
+sai_status_t stub_get_route_attribute(_In_ const sai_route_entry_t* route_entry,
                                       _In_ uint32_t                         attr_count,
                                       _Inout_ sai_attribute_t              *attr_list)
 {
-    const sai_object_key_t key = { .unicast_route_entry = unicast_route_entry };
+    const sai_object_key_t key = { .key = { .route_entry = *route_entry } };
     char                   key_str[MAX_KEY_STR_LEN];
 
     STUB_LOG_ENTER();
 
-    if (NULL == unicast_route_entry) {
-        STUB_LOG_ERR("NULL unicast_route_entry param\n");
+    if (NULL == route_entry) {
+        STUB_LOG_ERR("NULL route_entry param\n");
         return SAI_STATUS_INVALID_PARAMETER;
     }
 
-    route_key_to_str(unicast_route_entry, key_str);
+    route_key_to_str(route_entry, key_str);
     return sai_get_attributes(&key, key_str, route_attribs, route_vendor_attribs, attr_count, attr_list);
 }
 
@@ -312,4 +312,8 @@ const sai_route_api_t route_api = {
     stub_remove_route,
     stub_set_route_attribute,
     stub_get_route_attribute,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
 };

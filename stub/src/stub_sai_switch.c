@@ -21,7 +21,6 @@
 #undef  __MODULE__
 #define __MODULE__ SAI_SWITCH
 
-sai_switch_notification_t g_notification_callbacks;
 uint32_t                  gh_sdk = 0;
 
 sai_status_t stub_switch_port_number_get(_In_ const sai_object_key_t   *key,
@@ -214,11 +213,11 @@ static const sai_attribute_entry_t        switch_attribs[] = {
       "Switch maximum number of learned MAC addresses", SAI_ATTR_VAL_TYPE_U32 },
     { SAI_SWITCH_ATTR_FDB_AGING_TIME, false, false, true, true,
       "Switch FDB aging time", SAI_ATTR_VAL_TYPE_U32 },
-    { SAI_SWITCH_ATTR_FDB_UNICAST_MISS_ACTION, false, false, true, true,
+    { SAI_SWITCH_ATTR_FDB_UNICAST_MISS_PACKET_ACTION, false, false, true, true,
       "Switch flood control for unknown unicast address", SAI_ATTR_VAL_TYPE_S32 },
-    { SAI_SWITCH_ATTR_FDB_BROADCAST_MISS_ACTION, false, false, true, true,
+    { SAI_SWITCH_ATTR_FDB_BROADCAST_MISS_PACKET_ACTION, false, false, true, true,
       "Switch flood control for unknown broadcast address", SAI_ATTR_VAL_TYPE_S32 },
-    { SAI_SWITCH_ATTR_FDB_MULTICAST_MISS_ACTION, false, false, true, true,
+    { SAI_SWITCH_ATTR_FDB_MULTICAST_MISS_PACKET_ACTION, false, false, true, true,
       "Switch flood control for unknown multicast address", SAI_ATTR_VAL_TYPE_S32 },
     { SAI_SWITCH_ATTR_LAG_DEFAULT_HASH_SEED, false, false, true, true,
       "Switch LAG hash seed", SAI_ATTR_VAL_TYPE_U32 },
@@ -236,8 +235,8 @@ static const sai_attribute_entry_t        switch_attribs[] = {
       "Switch counter refresh interval", SAI_ATTR_VAL_TYPE_U32 },
     { SAI_SWITCH_ATTR_DEFAULT_TRAP_GROUP, false, false, true, true,
       "Switch default trap group", SAI_ATTR_VAL_TYPE_OID },
-    { SAI_SWITCH_ATTR_PORT_BREAKOUT, false, false, true, false,
-      "Switch port breakout mode", SAI_ATTR_VAL_TYPE_OID },
+//    { SAI_SWITCH_ATTR_PORT_BREAKOUT, false, false, true, false,
+//      "Switch port breakout mode", SAI_ATTR_VAL_TYPE_OID },
     { END_FUNCTIONALITY_ATTRIBS_ID, false, false, false, false,
       "", SAI_ATTR_VAL_TYPE_UNDETERMINED }
 };
@@ -337,17 +336,17 @@ static const sai_vendor_attribute_entry_t switch_vendor_attribs[] = {
       { false, false, true, true },
       stub_switch_aging_time_get, NULL,
       stub_switch_aging_time_set, NULL },
-    { SAI_SWITCH_ATTR_FDB_UNICAST_MISS_ACTION,
+    { SAI_SWITCH_ATTR_FDB_UNICAST_MISS_PACKET_ACTION,
       { false, false, false, false },
       { false, false, true, true },
       NULL, NULL,
       NULL, NULL },
-    { SAI_SWITCH_ATTR_FDB_BROADCAST_MISS_ACTION,
+    { SAI_SWITCH_ATTR_FDB_BROADCAST_MISS_PACKET_ACTION,
       { false, false, false, false },
       { false, false, true, true },
       NULL, NULL,
       NULL, NULL },
-    { SAI_SWITCH_ATTR_FDB_MULTICAST_MISS_ACTION,
+    { SAI_SWITCH_ATTR_FDB_MULTICAST_MISS_PACKET_ACTION,
       { false, false, false, false },
       { false, false, true, true },
       NULL, NULL,
@@ -392,11 +391,11 @@ static const sai_vendor_attribute_entry_t switch_vendor_attribs[] = {
       { false, false, true, true },
       stub_switch_default_trap_group_get, NULL,
       stub_switch_default_trap_group_set, NULL },
-    { SAI_SWITCH_ATTR_PORT_BREAKOUT,
-      { false, false, false, false },
-      { false, false, true, false },
-      NULL, NULL,
-      NULL, NULL },
+//    { SAI_SWITCH_ATTR_PORT_BREAKOUT,
+//      { false, false, false, false },
+//      { false, false, true, false },
+//      NULL, NULL,
+//      NULL, NULL },
 };
 
 
@@ -415,24 +414,11 @@ static const sai_vendor_attribute_entry_t switch_vendor_attribs[] = {
  *   SAI_STATUS_SUCCESS on success
  *   Failure status code on error
  */
-sai_status_t stub_initialize_switch(_In_ sai_switch_profile_id_t                           profile_id,
-                                    _In_reads_z_(SAI_MAX_HARDWARE_ID_LEN) char           * switch_hardware_id,
-                                    _In_reads_opt_z_(SAI_MAX_FIRMWARE_PATH_NAME_LEN) char* firmware_path_name,
-                                    _In_ sai_switch_notification_t                       * switch_notifications)
+sai_status_t stub_initialize_switch(_Out_ sai_object_id_t *switch_id,
+                                    _In_ uint32_t attr_count,
+                                    _In_ const sai_attribute_t *attr_list)
 {
-    if (NULL == switch_hardware_id) {
-        fprintf(stderr, "NULL switch hardware ID passed to SAI switch initialize\n");
-        return SAI_STATUS_INVALID_PARAMETER;
-    }
-
-    if (NULL == switch_notifications) {
-        fprintf(stderr, "NULL switch notifications passed to SAI switch initialize\n");
-
-        return SAI_STATUS_INVALID_PARAMETER;
-    }
-
     gh_sdk = 1;
-    memcpy(&g_notification_callbacks, switch_notifications, sizeof(g_notification_callbacks));
 
 #ifndef _WIN32
     openlog("SAI", 0, LOG_USER);
@@ -459,10 +445,10 @@ sai_status_t stub_initialize_switch(_In_ sai_switch_profile_id_t                
  * Return Values:
  *   None
  */
-void stub_shutdown_switch(_In_ bool warm_restart_hint)
+sai_status_t stub_shutdown_switch(_In_ sai_object_id_t switch_id)
 {
     STUB_LOG_NTC("Shutdown switch\n");
-    gh_sdk = 0;
+    return SAI_STATUS_SUCCESS;
 }
 
 /*
@@ -479,36 +465,36 @@ void stub_shutdown_switch(_In_ bool warm_restart_hint)
  *   SAI_STATUS_SUCCESS on success
  *   Failure status code on error
  */
-sai_status_t stub_connect_switch(_In_ sai_switch_profile_id_t                profile_id,
-                                 _In_reads_z_(SAI_MAX_HARDWARE_ID_LEN) char* switch_hardware_id,
-                                 _In_ sai_switch_notification_t            * switch_notifications)
-{
-    if (NULL == switch_hardware_id) {
-        fprintf(stderr, "NULL switch hardware ID passed to SAI switch connect\n");
-        return SAI_STATUS_INVALID_PARAMETER;
-    }
-
-    if (NULL == switch_notifications) {
-        fprintf(stderr, "NULL switch notifications passed to SAI switch connect\n");
-
-        return SAI_STATUS_INVALID_PARAMETER;
-    }
-
-    memcpy(&g_notification_callbacks, switch_notifications, sizeof(g_notification_callbacks));
-
-    /* Open an handle if not done already on init for init agent */
-    if (0 == gh_sdk) {
-#ifndef _WIN32
-        openlog("SAI", 0, LOG_USER);
-#endif
-    }
-
-    db_init_next_hop_group();
-
-    STUB_LOG_NTC("Connect switch\n");
-
-    return SAI_STATUS_SUCCESS;
-}
+//sai_status_t stub_connect_switch(_In_ sai_switch_profile_id_t                profile_id,
+//                                 _In_reads_z_(SAI_MAX_HARDWARE_ID_LEN) char* switch_hardware_id,
+//                                 _In_ sai_switch_notification_t            * switch_notifications)
+//{
+//    if (NULL == switch_hardware_id) {
+//        fprintf(stderr, "NULL switch hardware ID passed to SAI switch connect\n");
+//        return SAI_STATUS_INVALID_PARAMETER;
+//    }
+//
+//    if (NULL == switch_notifications) {
+//        fprintf(stderr, "NULL switch notifications passed to SAI switch connect\n");
+//
+//        return SAI_STATUS_INVALID_PARAMETER;
+//    }
+//
+//    memcpy(&g_notification_callbacks, switch_notifications, sizeof(g_notification_callbacks));
+//
+//    /* Open an handle if not done already on init for init agent */
+//    if (0 == gh_sdk) {
+//#ifndef _WIN32
+//        openlog("SAI", 0, LOG_USER);
+//#endif
+//    }
+//
+//    db_init_next_hop_group();
+//
+//    STUB_LOG_NTC("Connect switch\n");
+//
+//    return SAI_STATUS_SUCCESS;
+//}
 
 /*
  * Routine Description:
@@ -519,12 +505,12 @@ sai_status_t stub_connect_switch(_In_ sai_switch_profile_id_t                pro
  * Return Values:
  *   None
  */
-void stub_disconnect_switch(void)
-{
-    STUB_LOG_NTC("Disconnect switch\n");
-
-    memset(&g_notification_callbacks, 0, sizeof(g_notification_callbacks));
-}
+//void stub_disconnect_switch(void)
+//{
+//    STUB_LOG_NTC("Disconnect switch\n");
+//
+//    memset(&g_notification_callbacks, 0, sizeof(g_notification_callbacks));
+//}
 
 /*
  * Routine Description:
@@ -537,7 +523,8 @@ void stub_disconnect_switch(void)
  *    SAI_STATUS_SUCCESS on success
  *    Failure status code on error
  */
-sai_status_t stub_set_switch_attribute(_In_ const sai_attribute_t *attr)
+sai_status_t stub_set_switch_attribute(_In_ sai_object_id_t switch_id,
+                                       _In_ const sai_attribute_t *attr)
 {
     STUB_LOG_ENTER();
 
@@ -551,10 +538,10 @@ sai_status_t stub_switch_mode_set(_In_ const sai_object_key_t *key, _In_ const s
     STUB_LOG_ENTER();
 
     switch (value->s32) {
-    case SAI_SWITCHING_MODE_CUT_THROUGH:
+    case SAI_SWITCH_SWITCHING_MODE_CUT_THROUGH:
         break;
 
-    case SAI_SWITCHING_MODE_STORE_AND_FORWARD:
+    case SAI_SWITCH_SWITCHING_MODE_STORE_AND_FORWARD:
         break;
 
     default:
@@ -749,7 +736,9 @@ sai_status_t stub_switch_default_trap_group_set(_In_ const sai_object_key_t     
  *    SAI_STATUS_SUCCESS on success
  *    Failure status code on error
  */
-sai_status_t stub_get_switch_attribute(_In_ uint32_t attr_count, _Inout_ sai_attribute_t *attr_list)
+sai_status_t stub_get_switch_attribute(_In_ sai_object_id_t switch_id,
+                                       _In_ uint32_t attr_count,
+                                       _Inout_ sai_attribute_t *attr_list)
 {
     STUB_LOG_ENTER();
 
@@ -869,13 +858,13 @@ sai_status_t stub_switch_default_stp_get(_In_ const sai_object_key_t   *key,
                                          _Inout_ vendor_cache_t        *cache,
                                          void                          *arg)
 {
-    sai_status_t status;
+//    sai_status_t status;
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_create_object(SAI_OBJECT_TYPE_STP_INSTANCE, 1, &value->oid))) {
-        return status;
-    }
+//    if (SAI_STATUS_SUCCESS != (status = stub_create_object(SAI_OBJECT_TYPE_STP_INSTANCE, 1, &value->oid))) {
+//        return status;
+//    }
 
     STUB_LOG_EXIT();
     return SAI_STATUS_SUCCESS;
@@ -976,7 +965,7 @@ sai_status_t stub_switch_mode_get(_In_ const sai_object_key_t   *key,
 {
     STUB_LOG_ENTER();
 
-    value->s32 = SAI_SWITCHING_MODE_CUT_THROUGH;
+    value->s32 = SAI_SWITCH_SWITCHING_MODE_CUT_THROUGH;
 
     STUB_LOG_EXIT();
     return SAI_STATUS_SUCCESS;
@@ -1140,8 +1129,8 @@ sai_status_t stub_switch_default_trap_group_get(_In_ const sai_object_key_t   *k
 const sai_switch_api_t switch_api = {
     stub_initialize_switch,
     stub_shutdown_switch,
-    stub_connect_switch,
-    stub_disconnect_switch,
+//    stub_connect_switch,
+//    stub_disconnect_switch,
     stub_set_switch_attribute,
     stub_get_switch_attribute,
 };

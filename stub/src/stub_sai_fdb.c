@@ -50,7 +50,7 @@ sai_status_t stub_fdb_action_get(_In_ const sai_object_key_t   *key,
 static const sai_attribute_entry_t        fdb_attribs[] = {
     { SAI_FDB_ENTRY_ATTR_TYPE, true, true, true, true,
       "FDB entry type", SAI_ATTR_VAL_TYPE_S32 },
-    { SAI_FDB_ENTRY_ATTR_PORT_ID, true, true, true, true,
+    { SAI_FDB_ENTRY_ATTR_BRIDGE_PORT_ID, true, true, true, true,
       "FDB entry port id", SAI_ATTR_VAL_TYPE_OID},
     { SAI_FDB_ENTRY_ATTR_PACKET_ACTION, true, true, true, true,
       "FDB entry packet action", SAI_ATTR_VAL_TYPE_S32 },
@@ -63,7 +63,7 @@ static const sai_vendor_attribute_entry_t fdb_vendor_attribs[] = {
       { true, false, true, true },
       stub_fdb_type_get, NULL,
       stub_fdb_type_set, NULL },
-    { SAI_FDB_ENTRY_ATTR_PORT_ID,
+    { SAI_FDB_ENTRY_ATTR_BRIDGE_PORT_ID,
       { true, false, true, true },
       { true, false, true, true },
       stub_fdb_port_get, NULL,
@@ -76,14 +76,14 @@ static const sai_vendor_attribute_entry_t fdb_vendor_attribs[] = {
 };
 static void fdb_key_to_str(_In_ const sai_fdb_entry_t* fdb_entry, _Out_ char *key_str)
 {
-    snprintf(key_str, MAX_KEY_STR_LEN, "fdb entry mac [%02x:%02x:%02x:%02x:%02x:%02x] vlan %u",
+    snprintf(key_str, MAX_KEY_STR_LEN, "fdb entry mac [%02x:%02x:%02x:%02x:%02x:%02x] vlan %lu",
              fdb_entry->mac_address[0],
              fdb_entry->mac_address[1],
              fdb_entry->mac_address[2],
              fdb_entry->mac_address[3],
              fdb_entry->mac_address[4],
              fdb_entry->mac_address[5],
-             fdb_entry->vlan_id);
+             fdb_entry->bv_id);
 }
 
 /*
@@ -105,7 +105,7 @@ sai_status_t stub_create_fdb_entry(_In_ const sai_fdb_entry_t* fdb_entry,
 {
     sai_status_t                 status;
     const sai_attribute_value_t *type, *action, *port;
-    uint32_t                     type_index, action_index, port_index, port_id;
+    uint32_t                     type_index, action_index, port_id, port_index;
     char                         key_str[MAX_KEY_STR_LEN];
     char                         list_str[MAX_LIST_VALUE_STR_LEN];
 
@@ -136,7 +136,7 @@ sai_status_t stub_create_fdb_entry(_In_ const sai_fdb_entry_t* fdb_entry,
     assert(SAI_STATUS_SUCCESS ==
            find_attrib_in_list(attr_count, attr_list, SAI_FDB_ENTRY_ATTR_PACKET_ACTION, &action, &action_index));
     assert(SAI_STATUS_SUCCESS ==
-           find_attrib_in_list(attr_count, attr_list, SAI_FDB_ENTRY_ATTR_PORT_ID, &port, &port_index));
+           find_attrib_in_list(attr_count, attr_list, SAI_FDB_ENTRY_ATTR_BRIDGE_PORT_ID, &port, &port_index));
 
     if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(port->oid, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
@@ -189,7 +189,7 @@ sai_status_t stub_remove_fdb_entry(_In_ const sai_fdb_entry_t* fdb_entry)
  */
 sai_status_t stub_set_fdb_entry_attribute(_In_ const sai_fdb_entry_t* fdb_entry, _In_ const sai_attribute_t *attr)
 {
-    const sai_object_key_t key = {.fdb_entry = fdb_entry };
+    const sai_object_key_t key = { .key = {.fdb_entry = *fdb_entry }};
     char                   key_str[MAX_KEY_STR_LEN];
 
     STUB_LOG_ENTER();
@@ -256,7 +256,7 @@ sai_status_t stub_get_fdb_entry_attribute(_In_ const sai_fdb_entry_t* fdb_entry,
                                           _In_ uint32_t               attr_count,
                                           _Inout_ sai_attribute_t    *attr_list)
 {
-    const sai_object_key_t key = { .fdb_entry = fdb_entry };
+    const sai_object_key_t key = {.key={.fdb_entry=*fdb_entry}};
     char                   key_str[MAX_KEY_STR_LEN];
 
     STUB_LOG_ENTER();
@@ -279,7 +279,7 @@ sai_status_t stub_fdb_type_get(_In_ const sai_object_key_t   *key,
 {
     STUB_LOG_ENTER();
 
-    value->s32 = SAI_FDB_ENTRY_STATIC;
+    value->s32 = SAI_FDB_ENTRY_TYPE_STATIC;
 
     STUB_LOG_EXIT();
     return SAI_STATUS_SUCCESS;
@@ -337,35 +337,35 @@ sai_status_t stub_fdb_action_get(_In_ const sai_object_key_t   *key,
  *    SAI_STATUS_SUCCESS on success
  *    Failure status code on error
  */
-sai_status_t stub_flush_fdb_entries(_In_ uint32_t attr_count, _In_ const sai_attribute_t *attr_list)
+sai_status_t stub_flush_fdb_entries(_In_ sai_object_id_t switch_id, _In_ uint32_t attr_count, _In_ const sai_attribute_t *attr_list)
 {
-    sai_status_t                 status;
-    const sai_attribute_value_t *port, *vlan, *type;
-    uint32_t                     port_index, vlan_index, type_index;
-    uint32_t                     port_id;
+//    sai_status_t                 status;
+//    const sai_attribute_value_t *port, *vlan, *type;
+//    uint32_t                     port_index, vlan_index, type_index;
+//    uint32_t                     port_id;
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS ==
-        (status =
-             find_attrib_in_list(attr_count, attr_list, SAI_FDB_FLUSH_ATTR_PORT_ID,
-                                 &port, &port_index))) {
-        if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(port->oid, SAI_OBJECT_TYPE_PORT, &port_id))) {
-            return status;
-        }
-    }
-
-    if (SAI_STATUS_SUCCESS ==
-        (status =
-             find_attrib_in_list(attr_count, attr_list, SAI_FDB_FLUSH_ATTR_VLAN_ID,
-                                 &vlan, &vlan_index))) {
-    }
-
-    if (SAI_STATUS_SUCCESS ==
-        (status =
-             find_attrib_in_list(attr_count, attr_list, SAI_FDB_FLUSH_ATTR_ENTRY_TYPE,
-                                 &type, &type_index))) {
-    }
+//    if (SAI_STATUS_SUCCESS ==
+//        (status =
+//             find_attrib_in_list(attr_count, attr_list, SAI_FDB_FLUSH_ATTR_PORT_ID,
+//                                 &port, &port_index))) {
+//        if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(port->oid, SAI_OBJECT_TYPE_PORT, &port_id))) {
+//            return status;
+//        }
+//    }
+//
+//    if (SAI_STATUS_SUCCESS ==
+//        (status =
+//             find_attrib_in_list(attr_count, attr_list, SAI_FDB_FLUSH_ATTR_VLAN_ID,
+//                                 &vlan, &vlan_index))) {
+//    }
+//
+//    if (SAI_STATUS_SUCCESS ==
+//        (status =
+//             find_attrib_in_list(attr_count, attr_list, SAI_FDB_FLUSH_ATTR_ENTRY_TYPE,
+//                                 &type, &type_index))) {
+//    }
 
     STUB_LOG_EXIT();
     return SAI_STATUS_SUCCESS;

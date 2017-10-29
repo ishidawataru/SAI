@@ -29,9 +29,9 @@ static const sai_attribute_entry_t router_attribs[] = {
       "Router admin V6 state", SAI_ATTR_VAL_TYPE_BOOL },
     { SAI_VIRTUAL_ROUTER_ATTR_SRC_MAC_ADDRESS, false, true, true, true,
       "Router source MAC address", SAI_ATTR_VAL_TYPE_MAC },
-    { SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_TTL1_ACTION, false, true, true, true,
+    { SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_TTL1_PACKET_ACTION, false, true, true, true,
       "Router action for TTL0/1", SAI_ATTR_VAL_TYPE_S32 },
-    { SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_IP_OPTIONS, false, true, true, true,
+    { SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_IP_OPTIONS_PACKET_ACTION, false, true, true, true,
       "Router action for IP options", SAI_ATTR_VAL_TYPE_S32 },
     { END_FUNCTIONALITY_ATTRIBS_ID, false, false, false, false,
       "", SAI_ATTR_VAL_TYPE_UNDETERMINED }
@@ -78,16 +78,16 @@ static const sai_vendor_attribute_entry_t router_vendor_attribs[] = {
       { false, false, true, true },
       stub_router_mac_get, NULL,
       stub_router_mac_set, NULL },
-    { SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_TTL1_ACTION,
+    { SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_TTL1_PACKET_ACTION,
       { false, false, true, true },
       { false, false, true, true },
-      stub_router_violation_get, (void*)SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_TTL1_ACTION,
-      stub_router_violation_set, (void*)SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_TTL1_ACTION },
-    { SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_IP_OPTIONS,
+      stub_router_violation_get, (void*)SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_TTL1_PACKET_ACTION,
+      stub_router_violation_set, (void*)SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_TTL1_PACKET_ACTION },
+    { SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_IP_OPTIONS_PACKET_ACTION,
       { false, false, true, true },
       { false, false, true, true },
-      stub_router_violation_get, (void*)SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_IP_OPTIONS,
-      stub_router_violation_set, (void*)SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_IP_OPTIONS }
+      stub_router_violation_get, (void*)SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_IP_OPTIONS_PACKET_ACTION,
+      stub_router_violation_set, (void*)SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_IP_OPTIONS_PACKET_ACTION }
 };
 static void router_key_to_str(_In_ sai_object_id_t vr_id, _Out_ char *key_str)
 {
@@ -114,7 +114,7 @@ static void router_key_to_str(_In_ sai_object_id_t vr_id, _Out_ char *key_str)
  */
 sai_status_t stub_set_virtual_router_attribute(_In_ sai_object_id_t vr_id, _In_ const sai_attribute_t *attr)
 {
-    const sai_object_key_t key = { .object_id = vr_id };
+    const sai_object_key_t key = { .key = {.object_id = vr_id }};
     char                   key_str[MAX_KEY_STR_LEN];
 
     STUB_LOG_ENTER();
@@ -140,7 +140,7 @@ sai_status_t stub_get_virtual_router_attribute(_In_ sai_object_id_t     vr_id,
                                                _In_ uint32_t            attr_count,
                                                _Inout_ sai_attribute_t *attr_list)
 {
-    const sai_object_key_t key = { .object_id = vr_id };
+    const sai_object_key_t key = { .key = { .object_id = vr_id }};
     char                   key_str[MAX_KEY_STR_LEN];
 
     STUB_LOG_ENTER();
@@ -165,7 +165,7 @@ sai_status_t stub_router_admin_get(_In_ const sai_object_key_t   *key,
            (SAI_VIRTUAL_ROUTER_ATTR_ADMIN_V6_STATE == (int64_t)arg));
 
     if (SAI_STATUS_SUCCESS !=
-        (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_VIRTUAL_ROUTER, &router_id))) {
+        (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_VIRTUAL_ROUTER, &router_id))) {
         return status;
     }
 
@@ -187,7 +187,7 @@ sai_status_t stub_router_admin_set(_In_ const sai_object_key_t *key, _In_ const 
     assert((SAI_VIRTUAL_ROUTER_ATTR_ADMIN_V4_STATE == (int64_t)arg) ||
            (SAI_VIRTUAL_ROUTER_ATTR_ADMIN_V6_STATE == (int64_t)arg));
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &router_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &router_id))) {
         return status;
     }
 
@@ -208,7 +208,7 @@ sai_status_t stub_router_mac_get(_In_ const sai_object_key_t   *key,
     STUB_LOG_ENTER();
 
     if (SAI_STATUS_SUCCESS !=
-        (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_VIRTUAL_ROUTER, &router_id))) {
+        (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_VIRTUAL_ROUTER, &router_id))) {
         return status;
     }
 
@@ -224,7 +224,7 @@ sai_status_t stub_router_mac_set(_In_ const sai_object_key_t *key, _In_ const sa
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &router_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &router_id))) {
         return status;
     }
 
@@ -246,11 +246,11 @@ sai_status_t stub_router_violation_get(_In_ const sai_object_key_t   *key,
 
     STUB_LOG_ENTER();
 
-    assert((SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_IP_OPTIONS == (int64_t)arg) ||
-           (SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_TTL1_ACTION == (int64_t)arg));
+    assert((SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_IP_OPTIONS_PACKET_ACTION == (int64_t)arg) ||
+           (SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_TTL1_PACKET_ACTION == (int64_t)arg));
 
     if (SAI_STATUS_SUCCESS !=
-        (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_VIRTUAL_ROUTER, &router_id))) {
+        (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_VIRTUAL_ROUTER, &router_id))) {
         return status;
     }
 
@@ -272,10 +272,10 @@ sai_status_t stub_router_violation_set(_In_ const sai_object_key_t      *key,
 
     STUB_LOG_ENTER();
 
-    assert((SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_IP_OPTIONS == (int64_t)arg) ||
-           (SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_TTL1_ACTION == (int64_t)arg));
+    assert((SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_IP_OPTIONS_PACKET_ACTION == (int64_t)arg) ||
+           (SAI_VIRTUAL_ROUTER_ATTR_VIOLATION_TTL1_PACKET_ACTION == (int64_t)arg));
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &router_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &router_id))) {
         return status;
     }
 
@@ -296,6 +296,7 @@ sai_status_t stub_router_violation_set(_In_ const sai_object_key_t      *key,
  *    Failure status code on error
  */
 sai_status_t stub_create_virtual_router(_Out_ sai_object_id_t      *vr_id,
+                                        _In_ sai_object_id_t        switch_id,
                                         _In_ uint32_t               attr_count,
                                         _In_ const sai_attribute_t *attr_list)
 {

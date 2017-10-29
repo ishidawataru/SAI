@@ -18,7 +18,7 @@
 #include "sai.h"
 #include "stub_sai.h"
 
-service_method_table_t g_services;
+sai_service_method_table_t g_services;
 bool                   g_initialized = false;
 
 /*
@@ -33,7 +33,7 @@ bool                   g_initialized = false;
  *    SAI_STATUS_SUCCESS on success
  *    Failure status code on error
  */
-sai_status_t sai_api_initialize(_In_ uint64_t flags, _In_ const service_method_table_t* services)
+sai_status_t sai_api_initialize(_In_ uint64_t flags, _In_ const sai_service_method_table_t* services)
 {
     if ((NULL == services) || (NULL == services->profile_get_next_value) || (NULL == services->profile_get_value)) {
         fprintf(stderr, "Invalid services handle passed to SAI API initialize\n");
@@ -120,7 +120,7 @@ sai_status_t sai_api_query(_In_ sai_api_t sai_api_id, _Out_ void** api_method_ta
         *(const sai_neighbor_api_t**)api_method_table = &neighbor_api;
         return SAI_STATUS_SUCCESS;
 
-    case SAI_API_QOS_MAPS:
+    case SAI_API_QOS_MAP:
         /* TODO : implement */
         return SAI_STATUS_NOT_IMPLEMENTED;
 
@@ -128,7 +128,7 @@ sai_status_t sai_api_query(_In_ sai_api_t sai_api_id, _Out_ void** api_method_ta
         /* TODO : implement */
         return SAI_STATUS_NOT_IMPLEMENTED;
 
-    case SAI_API_HOST_INTERFACE:
+    case SAI_API_HOSTIF:
         *(const sai_hostif_api_t**)api_method_table = &host_interface_api;
         return SAI_STATUS_SUCCESS;
 
@@ -189,22 +189,22 @@ sai_status_t sai_api_uninitialize(void)
 sai_status_t sai_log_set(_In_ sai_api_t sai_api_id, _In_ sai_log_level_t log_level)
 {
     switch (log_level) {
-    case SAI_LOG_DEBUG:
+    case SAI_LOG_LEVEL_DEBUG:
         break;
 
-    case SAI_LOG_INFO:
+    case SAI_LOG_LEVEL_INFO:
         break;
 
-    case SAI_LOG_NOTICE:
+    case SAI_LOG_LEVEL_NOTICE:
         break;
 
-    case SAI_LOG_WARN:
+    case SAI_LOG_LEVEL_WARN:
         break;
 
-    case SAI_LOG_ERROR:
+    case SAI_LOG_LEVEL_ERROR:
         break;
 
-    case SAI_LOG_CRITICAL:
+    case SAI_LOG_LEVEL_CRITICAL:
         break;
 
     default:
@@ -243,13 +243,13 @@ sai_status_t sai_log_set(_In_ sai_api_t sai_api_id, _In_ sai_log_level_t log_lev
     case SAI_API_NEIGHBOR:
         break;
 
-    case SAI_API_QOS_MAPS:
+    case SAI_API_QOS_MAP:
         break;
 
     case SAI_API_ACL:
         break;
 
-    case SAI_API_HOST_INTERFACE:
+    case SAI_API_HOSTIF:
         break;
 
     case SAI_API_MIRROR:
