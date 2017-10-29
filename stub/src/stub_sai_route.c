@@ -312,8 +312,4 @@ const sai_route_api_t route_api = {
     stub_remove_route,
     stub_set_route_attribute,
     stub_get_route_attribute,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
 };

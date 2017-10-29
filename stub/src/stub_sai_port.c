@@ -1383,10 +1383,4 @@ const sai_port_api_t port_api = {
     stub_get_port_stats,
     NULL,
     NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
 };
