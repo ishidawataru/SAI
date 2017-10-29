@@ -516,9 +516,9 @@ sai_status_t sai_value_to_str(_In_ sai_attribute_value_t      value,
                               _In_ uint32_t                   max_length,
                               _Out_ char                     *value_str)
 {
-    uint32_t          ii;
-    uint32_t          pos = 0;
-    uint32_t          count;
+//    uint32_t          ii;
+//    uint32_t          pos = 0;
+//    uint32_t          count;
     stub_object_id_t *stub_object_id;
 
     if (NULL == value_str) {
@@ -602,44 +602,44 @@ sai_status_t sai_value_to_str(_In_ sai_attribute_value_t      value,
     case SAI_ATTR_VAL_TYPE_U32LIST:
     case SAI_ATTR_VAL_TYPE_S32LIST:
     case SAI_ATTR_VAL_TYPE_VLANLIST:
-    case SAI_ATTR_VAL_TYPE_PORTBREAKOUT:
-        if (SAI_ATTR_VAL_TYPE_PORTBREAKOUT == type) {
-            pos += snprintf(value_str, max_length, "breakout mode %d.", value.portbreakout.breakout_mode);
-        }
-        if (pos > max_length) {
-            return SAI_STATUS_SUCCESS;
-        }
-
-        count = (SAI_ATTR_VAL_TYPE_OBJLIST == type) ? value.objlist.count :
-                (SAI_ATTR_VAL_TYPE_U32LIST == type) ? value.u32list.count :
-                (SAI_ATTR_VAL_TYPE_S32LIST == type) ? value.s32list.count :
-                (SAI_ATTR_VAL_TYPE_VLANLIST == type) ? value.vlanlist.count :
-                value.portbreakout.port_list.count;
-        pos += snprintf(value_str + pos, max_length - pos, "%u : [", count);
-        if (pos > max_length) {
-            return SAI_STATUS_SUCCESS;
-        }
-
-        for (ii = 0; ii < count; ii++) {
-            if (SAI_ATTR_VAL_TYPE_OBJLIST == type) {
-                pos += snprintf(value_str + pos, max_length - pos, " %" PRIx64, value.objlist.list[ii]);
-            } else if (SAI_ATTR_VAL_TYPE_U32LIST == type) {
-                pos += snprintf(value_str + pos, max_length - pos, " %u", value.u32list.list[ii]);
-            } else if (SAI_ATTR_VAL_TYPE_S32LIST == type) {
-                pos += snprintf(value_str + pos, max_length - pos, " %d", value.s32list.list[ii]);
-            } else if (SAI_ATTR_VAL_TYPE_VLANLIST == type) {
-                pos += snprintf(value_str + pos, max_length - pos, " %u", value.vlanlist.list[ii]);
-            } else {
-                pos += snprintf(value_str + pos, max_length - pos, " %" PRIx64, value.portbreakout.port_list.list[ii]);
-            }
-            if (pos > max_length) {
-                return SAI_STATUS_SUCCESS;
-            }
-        }
-        snprintf(value_str + pos, max_length - pos, "]");
-        break;
-
-
+//    case SAI_ATTR_VAL_TYPE_PORTBREAKOUT:
+//        if (SAI_ATTR_VAL_TYPE_PORTBREAKOUT == type) {
+//            pos += snprintf(value_str, max_length, "breakout mode %d.", value.portbreakout.breakout_mode);
+//        }
+//        if (pos > max_length) {
+//            return SAI_STATUS_SUCCESS;
+//        }
+//
+//        count = (SAI_ATTR_VAL_TYPE_OBJLIST == type) ? value.objlist.count :
+//                (SAI_ATTR_VAL_TYPE_U32LIST == type) ? value.u32list.count :
+//                (SAI_ATTR_VAL_TYPE_S32LIST == type) ? value.s32list.count :
+//                (SAI_ATTR_VAL_TYPE_VLANLIST == type) ? value.vlanlist.count :
+//                value.portbreakout.port_list.count;
+//        pos += snprintf(value_str + pos, max_length - pos, "%u : [", count);
+//        if (pos > max_length) {
+//            return SAI_STATUS_SUCCESS;
+//        }
+//
+//        for (ii = 0; ii < count; ii++) {
+//            if (SAI_ATTR_VAL_TYPE_OBJLIST == type) {
+//                pos += snprintf(value_str + pos, max_length - pos, " %" PRIx64, value.objlist.list[ii]);
+//            } else if (SAI_ATTR_VAL_TYPE_U32LIST == type) {
+//                pos += snprintf(value_str + pos, max_length - pos, " %u", value.u32list.list[ii]);
+//            } else if (SAI_ATTR_VAL_TYPE_S32LIST == type) {
+//                pos += snprintf(value_str + pos, max_length - pos, " %d", value.s32list.list[ii]);
+//            } else if (SAI_ATTR_VAL_TYPE_VLANLIST == type) {
+//                pos += snprintf(value_str + pos, max_length - pos, " %u", value.vlanlist.list[ii]);
+//            } else {
+//                pos += snprintf(value_str + pos, max_length - pos, " %" PRIx64, value.portbreakout.port_list.list[ii]);
+//            }
+//            if (pos > max_length) {
+//                return SAI_STATUS_SUCCESS;
+//            }
+//        }
+//        snprintf(value_str + pos, max_length - pos, "]");
+//        break;
+//
+//
     case SAI_ATTR_VAL_TYPE_ACLFIELD:
     case SAI_ATTR_VAL_TYPE_ACLACTION:
         /* TODO : implement if in case it is used */
@@ -804,27 +804,27 @@ void sai_log_cb(sai_log_level_t severity, const char *module_name, char *msg)
 
     /* translate SDK log level to syslog level */
     switch (severity) {
-    case SAI_LOG_NOTICE:
+    case SAI_LOG_LEVEL_NOTICE:
         level     = LOG_NOTICE;
         level_str = "NOTICE";
         break;
 
-    case SAI_LOG_INFO:
+    case SAI_LOG_LEVEL_INFO:
         level     = LOG_INFO;
         level_str = "INFO";
         break;
 
-    case SAI_LOG_ERROR:
+    case SAI_LOG_LEVEL_ERROR:
         level     = LOG_ERR;
         level_str = "ERR";
         break;
 
-    case SAI_LOG_WARN:
+    case SAI_LOG_LEVEL_WARN:
         level     = LOG_WARNING;
         level_str = "WARNING";
         break;
 
-    case SAI_LOG_DEBUG:
+    case SAI_LOG_LEVEL_DEBUG:
         level     = LOG_DEBUG;
         level_str = "DEBUG";
         break;
@@ -859,7 +859,7 @@ void utils_log(const sai_log_level_t severity, const char *module_name, const ch
 {
     va_list args;
 
-    if (severity < SAI_LOG_INFO) {
+    if (severity < SAI_LOG_LEVEL_INFO) {
         return;
     }
 

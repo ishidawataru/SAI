@@ -93,6 +93,7 @@ static void next_hop_key_to_str(_In_ sai_object_id_t next_hop_id, _Out_ char *ke
  * Note: IP address expected in Network Byte Order.
  */
 sai_status_t stub_create_next_hop(_Out_ sai_object_id_t      *next_hop_id,
+                                  _In_ sai_object_id_t        switch_id,
                                   _In_ uint32_t               attr_count,
                                   _In_ const sai_attribute_t *attr_list)
 {
@@ -127,7 +128,7 @@ sai_status_t stub_create_next_hop(_Out_ sai_object_id_t      *next_hop_id,
     assert(SAI_STATUS_SUCCESS ==
            find_attrib_in_list(attr_count, attr_list, SAI_NEXT_HOP_ATTR_ROUTER_INTERFACE_ID, &rif, &rif_index));
 
-    if (SAI_NEXT_HOP_IP != type->s32) {
+    if (SAI_NEXT_HOP_ATTR_IP != type->s32) {
         STUB_LOG_ERR("Invalid next hop type %d on create\n", type->s32);
         return SAI_STATUS_INVALID_ATTR_VALUE_0 + type_index;
     }
@@ -187,7 +188,7 @@ sai_status_t stub_remove_next_hop(_In_ sai_object_id_t next_hop_id)
  */
 sai_status_t stub_set_next_hop_attribute(_In_ sai_object_id_t next_hop_id, _In_ const sai_attribute_t *attr)
 {
-    const sai_object_key_t key = { .object_id = next_hop_id };
+    const sai_object_key_t key = { .key = {.object_id = next_hop_id }};
     char                   key_str[MAX_KEY_STR_LEN];
 
     STUB_LOG_ENTER();
@@ -214,7 +215,7 @@ sai_status_t stub_get_next_hop_attribute(_In_ sai_object_id_t     next_hop_id,
                                          _In_ uint32_t            attr_count,
                                          _Inout_ sai_attribute_t *attr_list)
 {
-    const sai_object_key_t key = { .object_id = next_hop_id };
+    const sai_object_key_t key = { .key = { .object_id = next_hop_id }};
     char                   key_str[MAX_KEY_STR_LEN];
 
     STUB_LOG_ENTER();
@@ -232,7 +233,7 @@ sai_status_t stub_next_hop_type_get(_In_ const sai_object_key_t   *key,
 {
     STUB_LOG_ENTER();
 
-    value->s32 = SAI_NEXT_HOP_IP;
+    value->s32 = SAI_NEXT_HOP_ATTR_IP;
 
     STUB_LOG_EXIT();
     return SAI_STATUS_SUCCESS;
@@ -251,7 +252,7 @@ sai_status_t stub_next_hop_ip_get(_In_ const sai_object_key_t   *key,
     STUB_LOG_ENTER();
 
     if (SAI_STATUS_SUCCESS !=
-        (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_NEXT_HOP, &nexthop_data))) {
+        (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_NEXT_HOP, &nexthop_data))) {
         return status;
     }
 
@@ -275,7 +276,7 @@ sai_status_t stub_next_hop_rif_get(_In_ const sai_object_key_t   *key,
     STUB_LOG_ENTER();
 
     if (SAI_STATUS_SUCCESS !=
-        (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_NEXT_HOP, &nexthop_data))) {
+        (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_NEXT_HOP, &nexthop_data))) {
         return status;
     }
 

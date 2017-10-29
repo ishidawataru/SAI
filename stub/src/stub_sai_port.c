@@ -170,9 +170,9 @@ static const sai_attribute_entry_t        port_attribs[] = {
       "Port operational status", SAI_ATTR_VAL_TYPE_S32 },
     { SAI_PORT_ATTR_HW_LANE_LIST, false, false, false, true,
       "Port HW lane list", SAI_ATTR_VAL_TYPE_U32LIST },
-    { SAI_PORT_ATTR_SUPPORTED_BREAKOUT_MODE, false, false, false, true,
+    { SAI_PORT_ATTR_SUPPORTED_BREAKOUT_MODE_TYPE, false, false, false, true,
       "Port supported breakout modes", SAI_ATTR_VAL_TYPE_S32LIST },
-    { SAI_PORT_ATTR_CURRENT_BREAKOUT_MODE, false, false, false, true,
+    { SAI_PORT_ATTR_CURRENT_BREAKOUT_MODE_TYPE, false, false, false, true,
       "Port current breakout mode", SAI_ATTR_VAL_TYPE_S32 },
     { SAI_PORT_ATTR_SPEED, false, false, true, true,
       "Port speed", SAI_ATTR_VAL_TYPE_U32 },
@@ -186,15 +186,15 @@ static const sai_attribute_entry_t        port_attribs[] = {
       "Port default vlan", SAI_ATTR_VAL_TYPE_U16 },
     { SAI_PORT_ATTR_DEFAULT_VLAN_PRIORITY, false, false, true, true,
       "Port default vlan priority", SAI_ATTR_VAL_TYPE_U8 },
-    { SAI_PORT_ATTR_INGRESS_FILTERING, false, false, true, true,
+    { SAI_BRIDGE_PORT_ATTR_INGRESS_FILTERING, false, false, true, true,
       "Port ingress filtering", SAI_ATTR_VAL_TYPE_BOOL },
     { SAI_PORT_ATTR_DROP_UNTAGGED, false, false, true, true,
       "Port drop untageed", SAI_ATTR_VAL_TYPE_BOOL },
     { SAI_PORT_ATTR_DROP_TAGGED, false, false, true, true,
       "Port drop tageed", SAI_ATTR_VAL_TYPE_BOOL },
-    { SAI_PORT_ATTR_INTERNAL_LOOPBACK, false, false, true, true,
+    { SAI_PORT_ATTR_INTERNAL_LOOPBACK_MODE, false, false, true, true,
       "Port internal loopback", SAI_ATTR_VAL_TYPE_S32 },
-    { SAI_PORT_ATTR_FDB_LEARNING, false, false, true, true,
+    { SAI_BRIDGE_PORT_ATTR_FDB_LEARNING_MODE, false, false, true, true,
       "Port fdb learning", SAI_ATTR_VAL_TYPE_S32 },
     { SAI_PORT_ATTR_UPDATE_DSCP, false, false, true, true,
       "Port update DSCP", SAI_ATTR_VAL_TYPE_BOOL },
@@ -206,11 +206,11 @@ static const sai_attribute_entry_t        port_attribs[] = {
       "Port broadcast storm control", SAI_ATTR_VAL_TYPE_BOOL },
     { SAI_PORT_ATTR_MULTICAST_STORM_CONTROL_POLICER_ID, false, false, true, true,
       "Port multicast storm control", SAI_ATTR_VAL_TYPE_BOOL },
-    { SAI_PORT_ATTR_GLOBAL_FLOW_CONTROL, false, false, true, true,
+    { SAI_PORT_ATTR_GLOBAL_FLOW_CONTROL_MODE, false, false, true, true,
       "Port global flow control", SAI_ATTR_VAL_TYPE_S32 },
-    { SAI_PORT_ATTR_MAX_LEARNED_ADDRESSES, false, false, true, true,
+    { SAI_BRIDGE_PORT_ATTR_MAX_LEARNED_ADDRESSES, false, false, true, true,
       "Port max learned addresses", SAI_ATTR_VAL_TYPE_U32 },
-    { SAI_PORT_ATTR_FDB_LEARNING_LIMIT_VIOLATION, false, false, true, true,
+    { SAI_BRIDGE_PORT_ATTR_FDB_LEARNING_LIMIT_VIOLATION_PACKET_ACTION, false, false, true, true,
       "Port fdb learning limit violation", SAI_ATTR_VAL_TYPE_S32 },
     { SAI_PORT_ATTR_INGRESS_MIRROR_SESSION, false, false, true, true,
       "Port ingress mirror session", SAI_ATTR_VAL_TYPE_OBJLIST },
@@ -239,12 +239,12 @@ static const sai_vendor_attribute_entry_t port_vendor_attribs[] = {
       { false, false, false, true },
       stub_port_hw_lanes_get, NULL,
       NULL, NULL },
-    { SAI_PORT_ATTR_SUPPORTED_BREAKOUT_MODE,
+    { SAI_PORT_ATTR_SUPPORTED_BREAKOUT_MODE_TYPE,
       { false, false, false, true },
       { false, false, false, true },
       stub_port_supported_breakout_get, NULL,
       NULL, NULL },
-    { SAI_PORT_ATTR_CURRENT_BREAKOUT_MODE,
+    { SAI_PORT_ATTR_CURRENT_BREAKOUT_MODE_TYPE,
       { false, false, false, true },
       { false, false, false, true },
       stub_port_current_breakout_get, NULL,
@@ -279,7 +279,7 @@ static const sai_vendor_attribute_entry_t port_vendor_attribs[] = {
       { false, false, true, true },
       stub_port_default_vlan_prio_get, NULL,
       stub_port_default_vlan_prio_set, NULL },
-    { SAI_PORT_ATTR_INGRESS_FILTERING,
+    { SAI_BRIDGE_PORT_ATTR_INGRESS_FILTERING,
       { false, false, true, true },
       { false, false, true, true },
       stub_port_ingress_filter_get, NULL,
@@ -294,12 +294,12 @@ static const sai_vendor_attribute_entry_t port_vendor_attribs[] = {
       { false, false, true, true },
       stub_port_drop_tags_get, (void*)SAI_PORT_ATTR_DROP_TAGGED,
       stub_port_drop_tags_set, (void*)SAI_PORT_ATTR_DROP_TAGGED },
-    { SAI_PORT_ATTR_INTERNAL_LOOPBACK,
+    { SAI_PORT_ATTR_INTERNAL_LOOPBACK_MODE,
       { false, false, true, true },
       { false, false, true, true },
       stub_port_internal_loopback_get, NULL,
       stub_port_internal_loopback_set, NULL },
-    { SAI_PORT_ATTR_FDB_LEARNING,
+    { SAI_BRIDGE_PORT_ATTR_FDB_LEARNING_MODE,
       { false, false, true, true },
       { false, false, true, true },
       stub_port_fdb_learning_get, NULL,
@@ -329,17 +329,17 @@ static const sai_vendor_attribute_entry_t port_vendor_attribs[] = {
       { false, false, true, true },
       stub_port_storm_control_get, (void*)SAI_PORT_ATTR_MULTICAST_STORM_CONTROL_POLICER_ID,
       stub_port_storm_control_set, (void*)SAI_PORT_ATTR_MULTICAST_STORM_CONTROL_POLICER_ID },
-    { SAI_PORT_ATTR_GLOBAL_FLOW_CONTROL,
+    { SAI_PORT_ATTR_GLOBAL_FLOW_CONTROL_MODE,
       { false, false, false, false },
       { false, false, true, true },
       NULL, NULL,
       NULL, NULL },
-    { SAI_PORT_ATTR_MAX_LEARNED_ADDRESSES,
+    { SAI_BRIDGE_PORT_ATTR_MAX_LEARNED_ADDRESSES,
       { false, false, true, true },
       { false, false, true, true },
       stub_port_max_learned_addr_get, NULL,
       stub_port_max_learned_addr_set, NULL },
-    { SAI_PORT_ATTR_FDB_LEARNING_LIMIT_VIOLATION,
+    { SAI_BRIDGE_PORT_ATTR_FDB_LEARNING_LIMIT_VIOLATION_PACKET_ACTION,
       { false, false, false, false },
       { false, false, true, true },
       stub_port_fdb_violation_get, NULL,
@@ -374,7 +374,7 @@ sai_status_t stub_port_state_set(_In_ const sai_object_key_t *key, _In_ const sa
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -392,7 +392,7 @@ sai_status_t stub_port_update_dscp_set(_In_ const sai_object_key_t      *key,
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -410,7 +410,7 @@ sai_status_t stub_port_storm_control_set(_In_ const sai_object_key_t      *key,
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -430,7 +430,7 @@ sai_status_t stub_port_fdb_violation_set(_In_ const sai_object_key_t      *key,
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -448,7 +448,7 @@ sai_status_t stub_port_max_learned_addr_set(_In_ const sai_object_key_t      *ke
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -466,7 +466,7 @@ sai_status_t stub_port_media_type_set(_In_ const sai_object_key_t      *key,
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -486,7 +486,7 @@ sai_status_t stub_port_default_vlan_set(_In_ const sai_object_key_t      *key,
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -505,7 +505,7 @@ sai_status_t stub_port_default_vlan_prio_set(_In_ const sai_object_key_t      *k
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -523,7 +523,7 @@ sai_status_t stub_port_ingress_filter_set(_In_ const sai_object_key_t      *key,
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -544,7 +544,7 @@ sai_status_t stub_port_drop_tags_set(_In_ const sai_object_key_t      *key,
 
     assert((SAI_PORT_ATTR_DROP_UNTAGGED == (int64_t)arg) || (SAI_PORT_ATTR_DROP_TAGGED == (int64_t)arg));
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -562,18 +562,18 @@ sai_status_t stub_port_internal_loopback_set(_In_ const sai_object_key_t      *k
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
     switch (value->s32) {
-    case SAI_PORT_INTERNAL_LOOPBACK_NONE:
+    case SAI_PORT_INTERNAL_LOOPBACK_MODE_NONE:
         break;
 
-    case SAI_PORT_INTERNAL_LOOPBACK_PHY:
+    case SAI_PORT_INTERNAL_LOOPBACK_MODE_PHY:
         break;
 
-    case SAI_PORT_INTERNAL_LOOPBACK_MAC:
+    case SAI_PORT_INTERNAL_LOOPBACK_MODE_MAC:
         break;
 
     default:
@@ -595,20 +595,20 @@ sai_status_t stub_port_fdb_learning_set(_In_ const sai_object_key_t      *key,
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
     switch (value->s32) {
-    case SAI_PORT_LEARN_MODE_DISABLE:
+    case SAI_BRIDGE_PORT_FDB_LEARNING_MODE_DISABLE:
         break;
 
-    case SAI_PORT_LEARN_MODE_HW:
+    case SAI_BRIDGE_PORT_FDB_LEARNING_MODE_HW:
         break;
 
-    case SAI_PORT_LEARN_MODE_DROP:
-    case SAI_PORT_LEARN_MODE_CPU_TRAP:
-    case SAI_PORT_LEARN_MODE_CPU_LOG:
+    case SAI_BRIDGE_PORT_FDB_LEARNING_MODE_DROP:
+    case SAI_BRIDGE_PORT_FDB_LEARNING_MODE_CPU_TRAP:
+    case SAI_BRIDGE_PORT_FDB_LEARNING_MODE_CPU_LOG:
         break;
 
     default:
@@ -628,7 +628,7 @@ sai_status_t stub_port_mtu_set(_In_ const sai_object_key_t *key, _In_ const sai_
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -644,7 +644,7 @@ sai_status_t stub_port_speed_set(_In_ const sai_object_key_t *key, _In_ const sa
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -660,7 +660,7 @@ sai_status_t stub_port_autoneg_set(_In_ const sai_object_key_t *key, _In_ const 
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -680,7 +680,7 @@ sai_status_t stub_port_type_get(_In_ const sai_object_key_t   *key,
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -702,7 +702,7 @@ sai_status_t stub_port_max_learned_addr_get(_In_ const sai_object_key_t   *key,
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -726,7 +726,7 @@ sai_status_t stub_port_fdb_violation_get(_In_ const sai_object_key_t   *key,
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -748,11 +748,11 @@ sai_status_t stub_port_media_type_get(_In_ const sai_object_key_t   *key,
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
-    value->s32 = SAI_PORT_MEDIA_TYPE_QSFP_COPPER;
+    value->s32 = SAI_PORT_MEDIA_TYPE_COPPER;
 
     STUB_LOG_EXIT();
     return SAI_STATUS_SUCCESS;
@@ -770,7 +770,7 @@ sai_status_t stub_port_update_dscp_get(_In_ const sai_object_key_t   *key,
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -792,7 +792,7 @@ sai_status_t stub_port_storm_control_get(_In_ const sai_object_key_t   *key,
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -817,7 +817,7 @@ sai_status_t stub_port_state_get(_In_ const sai_object_key_t   *key,
 
     assert((SAI_PORT_ATTR_OPER_STATUS == (int64_t)arg) || (SAI_PORT_ATTR_ADMIN_STATE == (int64_t)arg));
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -845,7 +845,7 @@ sai_status_t stub_port_hw_lanes_get(_In_ const sai_object_key_t   *key,
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -869,7 +869,7 @@ sai_status_t stub_port_supported_breakout_get(_In_ const sai_object_key_t   *key
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -889,11 +889,11 @@ sai_status_t stub_port_current_breakout_get(_In_ const sai_object_key_t   *key,
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
-    value->s32 = SAI_PORT_BREAKOUT_MODE_4_LANE;
+    value->s32 = SAI_PORT_BREAKOUT_MODE_TYPE_4_LANE;
 
     STUB_LOG_EXIT();
     return SAI_STATUS_SUCCESS;
@@ -911,7 +911,7 @@ sai_status_t stub_port_speed_get(_In_ const sai_object_key_t   *key,
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -933,7 +933,7 @@ sai_status_t stub_port_autoneg_get(_In_ const sai_object_key_t   *key,
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -957,7 +957,7 @@ sai_status_t stub_port_default_vlan_get(_In_ const sai_object_key_t   *key,
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -980,7 +980,7 @@ sai_status_t stub_port_default_vlan_prio_get(_In_ const sai_object_key_t   *key,
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -1002,7 +1002,7 @@ sai_status_t stub_port_ingress_filter_get(_In_ const sai_object_key_t   *key,
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -1027,7 +1027,7 @@ sai_status_t stub_port_drop_tags_get(_In_ const sai_object_key_t   *key,
 
     assert((SAI_PORT_ATTR_DROP_UNTAGGED == (int64_t)arg) || (SAI_PORT_ATTR_DROP_TAGGED == (int64_t)arg));
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -1049,11 +1049,11 @@ sai_status_t stub_port_internal_loopback_get(_In_ const sai_object_key_t   *key,
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
-    value->s32 = SAI_PORT_INTERNAL_LOOPBACK_NONE;
+    value->s32 = SAI_PORT_INTERNAL_LOOPBACK_MODE_NONE;
 
     STUB_LOG_EXIT();
     return SAI_STATUS_SUCCESS;
@@ -1071,11 +1071,11 @@ sai_status_t stub_port_fdb_learning_get(_In_ const sai_object_key_t   *key,
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
-    value->s32 = SAI_PORT_LEARN_MODE_HW;
+    value->s32 = SAI_BRIDGE_PORT_FDB_LEARNING_MODE_HW;
 
     STUB_LOG_EXIT();
     return SAI_STATUS_SUCCESS;
@@ -1093,7 +1093,7 @@ sai_status_t stub_port_mtu_get(_In_ const sai_object_key_t   *key,
 
     STUB_LOG_ENTER();
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_PORT, &port_id))) {
         return status;
     }
 
@@ -1128,7 +1128,7 @@ static void port_key_to_str(_In_ sai_object_id_t port_id, _Out_ char *key_str)
  */
 sai_status_t stub_set_port_attribute(_In_ sai_object_id_t port_id, _In_ const sai_attribute_t *attr)
 {
-    const sai_object_key_t key = { .object_id = port_id };
+    const sai_object_key_t key = { .key = { .object_id = port_id } };
     char                   key_str[MAX_KEY_STR_LEN];
 
     STUB_LOG_ENTER();
@@ -1155,7 +1155,7 @@ sai_status_t stub_get_port_attribute(_In_ sai_object_id_t     port_id,
                                      _In_ uint32_t            attr_count,
                                      _Inout_ sai_attribute_t *attr_list)
 {
-    const sai_object_key_t key = { .object_id = port_id };
+    const sai_object_key_t key = { .key = { .object_id = port_id } };
     char                   key_str[MAX_KEY_STR_LEN];
 
     STUB_LOG_ENTER();
@@ -1179,8 +1179,8 @@ sai_status_t stub_get_port_attribute(_In_ sai_object_id_t     port_id,
  *    Failure status code on error
  */
 sai_status_t stub_get_port_stats(_In_ sai_object_id_t                port_id,
-                                 _In_ const sai_port_stat_counter_t *counter_ids,
                                  _In_ uint32_t                       number_of_counters,
+                                 _In_ const sai_port_stat_t *counter_ids,
                                  _Out_ uint64_t                     *counters)
 {
     sai_status_t status;
@@ -1376,9 +1376,17 @@ sai_status_t stub_get_port_stats(_In_ sai_object_id_t                port_id,
 }
 
 const sai_port_api_t port_api = {
+    NULL,
+    NULL,
     stub_set_port_attribute,
     stub_get_port_attribute,
     stub_get_port_stats,
     NULL,
-    NULL
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
 };

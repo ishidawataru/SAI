@@ -28,7 +28,7 @@
 static const sai_attribute_entry_t host_interface_attribs[] = {
     { SAI_HOSTIF_ATTR_TYPE, true, true, false, true,
       "Host interface type", SAI_ATTR_VAL_TYPE_S32 },
-    { SAI_HOSTIF_ATTR_RIF_OR_PORT_ID, false, true, false, true,
+    { SAI_HOSTIF_ATTR_OBJ_ID, false, true, false, true,
       "Host interface associated port or router interface", SAI_ATTR_VAL_TYPE_OID },
     { SAI_HOSTIF_ATTR_NAME, true, true, true, true,
       "Host interface name", SAI_ATTR_VAL_TYPE_CHARDATA },
@@ -61,7 +61,7 @@ static const sai_vendor_attribute_entry_t host_interface_vendor_attribs[] = {
       { true, false, false, true },
       stub_host_interface_type_get, NULL,
       NULL, NULL },
-    { SAI_HOSTIF_ATTR_RIF_OR_PORT_ID,
+    { SAI_HOSTIF_ATTR_OBJ_ID,
       { true, false, false, true },
       { true, false, false, true },
       stub_host_interface_rif_port_get, NULL,
@@ -76,7 +76,7 @@ static void host_interface_key_to_str(_In_ sai_object_id_t hif_id, _Out_ char *k
 {
     uint32_t hif_data;
 
-    if (SAI_STATUS_SUCCESS != stub_object_to_type(hif_id, SAI_OBJECT_TYPE_HOST_INTERFACE, &hif_data)) {
+    if (SAI_STATUS_SUCCESS != stub_object_to_type(hif_id, SAI_OBJECT_TYPE_HOSTIF, &hif_data)) {
         snprintf(key_str, MAX_KEY_STR_LEN, "invalid host interface");
     } else {
         snprintf(key_str, MAX_KEY_STR_LEN, "host interface %u", hif_data);
@@ -97,6 +97,7 @@ static void host_interface_key_to_str(_In_ sai_object_id_t hif_id, _Out_ char *k
  *    Failure status code on error
  */
 sai_status_t stub_create_host_interface(_Out_ sai_object_id_t     * hif_id,
+                                        _In_ sai_object_id_t        switch_id,
                                         _In_ uint32_t               attr_count,
                                         _In_ const sai_attribute_t *attr_list)
 {
@@ -135,7 +136,7 @@ sai_status_t stub_create_host_interface(_Out_ sai_object_id_t     * hif_id,
     if (SAI_HOSTIF_TYPE_NETDEV == type->s32) {
         if (SAI_STATUS_SUCCESS !=
             (status =
-                 find_attrib_in_list(attr_count, attr_list, SAI_HOSTIF_ATTR_RIF_OR_PORT_ID, &rif_port,
+                 find_attrib_in_list(attr_count, attr_list, SAI_HOSTIF_ATTR_OBJ_ID, &rif_port,
                                      &rif_port_index))) {
             STUB_LOG_ERR("Missing mandatory attribute rif port id on create of host if netdev type\n");
             return SAI_STATUS_MANDATORY_ATTRIBUTE_MISSING;
@@ -167,7 +168,7 @@ sai_status_t stub_create_host_interface(_Out_ sai_object_id_t     * hif_id,
         return SAI_STATUS_INVALID_ATTR_VALUE_0 + type_index;
     }
 
-    if (SAI_STATUS_SUCCESS != (status = stub_create_object(SAI_OBJECT_TYPE_HOST_INTERFACE, next_id++, hif_id))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_create_object(SAI_OBJECT_TYPE_HOSTIF, next_id++, hif_id))) {
         return status;
     }
     host_interface_key_to_str(*hif_id, key_str);
@@ -199,7 +200,7 @@ sai_status_t stub_remove_host_interface(_In_ sai_object_id_t hif_id)
     host_interface_key_to_str(hif_id, key_str);
     STUB_LOG_NTC("Remove host interface %s\n", key_str);
 
-    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(hif_id, SAI_OBJECT_TYPE_HOST_INTERFACE, &hif_data))) {
+    if (SAI_STATUS_SUCCESS != (status = stub_object_to_type(hif_id, SAI_OBJECT_TYPE_HOSTIF, &hif_data))) {
         return status;
     }
 
@@ -221,7 +222,7 @@ sai_status_t stub_remove_host_interface(_In_ sai_object_id_t hif_id)
  */
 sai_status_t stub_set_host_interface_attribute(_In_ sai_object_id_t hif_id, _In_ const sai_attribute_t *attr)
 {
-    const sai_object_key_t key = { .object_id = hif_id };
+    const sai_object_key_t key = { .key = {.object_id = hif_id }};
     char                   key_str[MAX_KEY_STR_LEN];
 
     STUB_LOG_ENTER();
@@ -247,7 +248,7 @@ sai_status_t stub_get_host_interface_attribute(_In_ sai_object_id_t     hif_id,
                                                _In_ uint32_t            attr_count,
                                                _Inout_ sai_attribute_t *attr_list)
 {
-    const sai_object_key_t key = { .object_id = hif_id };
+    const sai_object_key_t key = { .key = {.object_id = hif_id }};
     char                   key_str[MAX_KEY_STR_LEN];
 
     STUB_LOG_ENTER();
@@ -310,11 +311,11 @@ sai_status_t stub_host_interface_name_get(_In_ const sai_object_key_t   *key,
     STUB_LOG_ENTER();
 
     if (SAI_STATUS_SUCCESS !=
-        (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_HOST_INTERFACE, &hif_id))) {
+        (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_HOSTIF, &hif_id))) {
         return status;
     }
 
-    strncpy(value->chardata, "name", HOSTIF_NAME_SIZE);
+    strncpy(value->chardata, "name", SAI_HOSTIF_NAME_SIZE);
 
     STUB_LOG_EXIT();
     return SAI_STATUS_SUCCESS;
@@ -333,7 +334,7 @@ sai_status_t stub_host_interface_name_set(_In_ const sai_object_key_t      *key,
     STUB_LOG_ENTER();
 
     if (SAI_STATUS_SUCCESS !=
-        (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_HOST_INTERFACE, &hif_id))) {
+        (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_HOSTIF, &hif_id))) {
         return status;
     }
 
@@ -360,10 +361,18 @@ const sai_hostif_api_t host_interface_api = {
     NULL,
     NULL,
     NULL,
-    stub_set_host_interface_trap_attribute,
     NULL,
     NULL,
     NULL,
     NULL,
-    NULL
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
 };

@@ -27,7 +27,7 @@ static const sai_attribute_entry_t next_hop_group_attribs[] = {
       "Next hop group entries count", SAI_ATTR_VAL_TYPE_U32 },
     { SAI_NEXT_HOP_GROUP_ATTR_TYPE, true, true, false, true,
       "Next hop group type", SAI_ATTR_VAL_TYPE_S32 },
-    { SAI_NEXT_HOP_GROUP_ATTR_NEXT_HOP_LIST, true, true, true, true,
+    { SAI_NEXT_HOP_GROUP_ATTR_NEXT_HOP_MEMBER_LIST, true, true, true, true,
       "Next hop group hop list", SAI_ATTR_VAL_TYPE_OBJLIST },
     { END_FUNCTIONALITY_ATTRIBS_ID, false, false, false, false,
       "", SAI_ATTR_VAL_TYPE_UNDETERMINED }
@@ -63,7 +63,7 @@ static const sai_vendor_attribute_entry_t next_hop_group_vendor_attribs[] = {
       { true, false, false, true },
       stub_next_hop_group_type_get, NULL,
       NULL, NULL },
-    { SAI_NEXT_HOP_GROUP_ATTR_NEXT_HOP_LIST,
+    { SAI_NEXT_HOP_GROUP_ATTR_NEXT_HOP_MEMBER_LIST,
       { true, false, true, true },
       { true, false, true, true },
       stub_next_hop_group_hop_list_get, NULL,
@@ -324,7 +324,8 @@ static void next_hop_group_key_to_str(_In_ sai_object_id_t next_hop_group_id, _O
  *    SAI_STATUS_SUCCESS on success
  *    Failure status code on error
  */
-sai_status_t stub_create_next_hop_group(_Out_ sai_object_id_t     * next_hop_group_id,
+sai_status_t stub_create_next_hop_group(_Out_ sai_object_id_t      *next_hop_group_id,
+                                        _In_ sai_object_id_t        switch_id,
                                         _In_ uint32_t               attr_count,
                                         _In_ const sai_attribute_t *attr_list)
 {
@@ -357,11 +358,11 @@ sai_status_t stub_create_next_hop_group(_Out_ sai_object_id_t     * next_hop_gro
     assert(SAI_STATUS_SUCCESS ==
            find_attrib_in_list(attr_count,
                                attr_list,
-                               SAI_NEXT_HOP_GROUP_ATTR_NEXT_HOP_LIST,
+                               SAI_NEXT_HOP_GROUP_ATTR_NEXT_HOP_MEMBER_LIST,
                                &hop_list,
                                &hop_list_index));
 
-    if (SAI_NEXT_HOP_GROUP_ECMP != type->s32) {
+    if (SAI_NEXT_HOP_GROUP_TYPE_ECMP != type->s32) {
         STUB_LOG_ERR("Invalid next hop group type %d on create\n", type->s32);
         return SAI_STATUS_INVALID_ATTR_VALUE_0 + type_index;
     }
@@ -433,7 +434,7 @@ sai_status_t stub_remove_next_hop_group(_In_ sai_object_id_t next_hop_group_id)
 sai_status_t stub_set_next_hop_group_attribute(_In_ sai_object_id_t        next_hop_group_id,
                                                _In_ const sai_attribute_t *attr)
 {
-    const sai_object_key_t key = { .object_id = next_hop_group_id };
+    const sai_object_key_t key = { .key = {.object_id = next_hop_group_id }};
     char                   key_str[MAX_KEY_STR_LEN];
 
     STUB_LOG_ENTER();
@@ -459,7 +460,7 @@ sai_status_t stub_get_next_hop_group_attribute(_In_ sai_object_id_t     next_hop
                                                _In_ uint32_t            attr_count,
                                                _Inout_ sai_attribute_t *attr_list)
 {
-    const sai_object_key_t key = { .object_id = next_hop_group_id };
+    const sai_object_key_t key = { .key = {.object_id = next_hop_group_id }};
     char                   key_str[MAX_KEY_STR_LEN];
 
     STUB_LOG_ENTER();
@@ -482,7 +483,7 @@ sai_status_t stub_next_hop_group_type_get(_In_ const sai_object_key_t   *key,
 {
     STUB_LOG_ENTER();
 
-    value->s32 = SAI_NEXT_HOP_GROUP_ECMP;
+    value->s32 = SAI_NEXT_HOP_GROUP_TYPE_ECMP;
 
     STUB_LOG_EXIT();
     return SAI_STATUS_SUCCESS;
@@ -502,7 +503,7 @@ sai_status_t stub_next_hop_group_count_get(_In_ const sai_object_key_t   *key,
     STUB_LOG_ENTER();
 
     if (SAI_STATUS_SUCCESS !=
-        (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_NEXT_HOP_GROUP, &group_id))) {
+        (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_NEXT_HOP_GROUP, &group_id))) {
         return status;
     }
 
@@ -531,7 +532,7 @@ sai_status_t stub_next_hop_group_hop_list_get(_In_ const sai_object_key_t   *key
     STUB_LOG_ENTER();
 
     if (SAI_STATUS_SUCCESS !=
-        (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_NEXT_HOP_GROUP, &group_id))) {
+        (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_NEXT_HOP_GROUP, &group_id))) {
         return status;
     }
 
@@ -559,7 +560,7 @@ sai_status_t stub_next_hop_group_hop_list_set(_In_ const sai_object_key_t      *
     STUB_LOG_ENTER();
 
     if (SAI_STATUS_SUCCESS !=
-        (status = stub_object_to_type(key->object_id, SAI_OBJECT_TYPE_NEXT_HOP_GROUP, &group_id))) {
+        (status = stub_object_to_type(key->key.object_id, SAI_OBJECT_TYPE_NEXT_HOP_GROUP, &group_id))) {
         return status;
     }
 
@@ -587,28 +588,29 @@ sai_status_t stub_next_hop_group_hop_list_set(_In_ const sai_object_key_t      *
  *    SAI_STATUS_SUCCESS on success
  *    Failure status code on error
  */
-sai_status_t stub_add_next_hop_to_group(_In_ sai_object_id_t        next_hop_group_id,
-                                        _In_ uint32_t               next_hop_count,
-                                        _In_ const sai_object_id_t* nexthops)
+sai_status_t stub_add_next_hop_to_group(_Out_ sai_object_id_t *next_hop_group_member_id,
+                                        _In_ sai_object_id_t        switch_id,
+                                        _In_ uint32_t               attr_count,
+                                        _In_ const sai_attribute_t *attr_list)
 {
-    sai_status_t status;
-    char         value[MAX_LIST_VALUE_STR_LEN];
-    uint32_t     group_id;
-    char         key_str[MAX_KEY_STR_LEN];
+//    sai_status_t status;
+//    char         value[MAX_LIST_VALUE_STR_LEN];
+//    uint32_t     group_id;
+//    char         key_str[MAX_KEY_STR_LEN];
 
     STUB_LOG_ENTER();
 
-    if (NULL == nexthops) {
+/*    if (NULL == nexthops) {
         STUB_LOG_ERR("NULL nexthops param\n");
         return SAI_STATUS_INVALID_PARAMETER;
     }
 
-    next_hop_group_key_to_str(next_hop_group_id, key_str);
+    next_hop_group_key_to_str(*next_hop_group_id, key_str);
     sai_nexthops_to_str(next_hop_count, nexthops, MAX_LIST_VALUE_STR_LEN, value);
     STUB_LOG_NTC("Add next hops {%s} to %s\n", value, key_str);
 
     if (SAI_STATUS_SUCCESS !=
-        (status = stub_object_to_type(next_hop_group_id, SAI_OBJECT_TYPE_NEXT_HOP_GROUP, &group_id))) {
+        (status = stub_object_to_type(*next_hop_group_id, SAI_OBJECT_TYPE_NEXT_HOP_GROUP, &group_id))) {
         return status;
     }
 
@@ -616,6 +618,7 @@ sai_status_t stub_add_next_hop_to_group(_In_ sai_object_id_t        next_hop_gro
         (status = db_add_members_next_hop_group_list(group_id, next_hop_count, nexthops))) {
         return status;
     }
+*/
 
     /* TODO : update route with next hop list changes */
 
@@ -636,22 +639,22 @@ sai_status_t stub_add_next_hop_to_group(_In_ sai_object_id_t        next_hop_gro
  *    SAI_STATUS_SUCCESS on success
  *    Failure status code on error
  */
-sai_status_t stub_remove_next_hop_from_group(_In_ sai_object_id_t        next_hop_group_id,
-                                             _In_ uint32_t               next_hop_count,
-                                             _In_ const sai_object_id_t* nexthops)
+sai_status_t stub_remove_next_hop_from_group(_In_ sai_object_id_t        next_hop_group_id)
+//                                             _In_ uint32_t               next_hop_count,
+//                                             _In_ const sai_object_id_t* nexthops)
 {
+    
+/*
     sai_status_t status;
     char         value[MAX_LIST_VALUE_STR_LEN];
     uint32_t     group_id;
     char         key_str[MAX_KEY_STR_LEN];
+*/
 
     STUB_LOG_ENTER();
 
-    if (NULL == nexthops) {
-        STUB_LOG_ERR("NULL nexthops param\n");
-        return SAI_STATUS_INVALID_PARAMETER;
-    }
-
+/*  TODO
+ *
     next_hop_group_key_to_str(next_hop_group_id, key_str);
     sai_nexthops_to_str(next_hop_count, nexthops, MAX_LIST_VALUE_STR_LEN, value);
     STUB_LOG_NTC("Remove next hops {%s} from %s\n", value, key_str);
@@ -665,9 +668,49 @@ sai_status_t stub_remove_next_hop_from_group(_In_ sai_object_id_t        next_ho
         (status = db_remove_members_next_hop_group_list(group_id, next_hop_count, nexthops))) {
         return status;
     }
-
+*/
     /* TODO : update route with next hop list changes */
 
+    STUB_LOG_EXIT();
+    return SAI_STATUS_SUCCESS;
+}
+
+sai_status_t stub_set_next_hop_group_member_attribute(
+        _In_ sai_object_id_t next_hop_group_id,
+        _In_ const sai_attribute_t *attr){
+    STUB_LOG_ENTER();
+    STUB_LOG_EXIT();
+    return SAI_STATUS_SUCCESS;
+}
+
+sai_status_t stub_get_next_hop_group_member_attribute(
+        _In_ sai_object_id_t next_hop_group_id,
+        _In_ uint32_t attr_count,
+        _Inout_ sai_attribute_t *attr_list){
+    STUB_LOG_ENTER();
+    STUB_LOG_EXIT();
+    return SAI_STATUS_SUCCESS;
+}
+
+sai_status_t stub_create_next_hop_group_members(
+        _In_ sai_object_id_t switch_id,
+        _In_ uint32_t object_count,
+        _In_ const uint32_t *attr_count,
+        _In_ const sai_attribute_t **attr_list,
+        _In_ sai_bulk_op_error_mode_t mode,
+        _Out_ sai_object_id_t *object_id,
+        _Out_ sai_status_t *object_statuses){
+    STUB_LOG_ENTER();
+    STUB_LOG_EXIT();
+    return SAI_STATUS_SUCCESS;
+}
+
+sai_status_t stub_remove_next_hop_group_members(
+        _In_ uint32_t object_count,
+        _In_ const sai_object_id_t *object_id,
+        _In_ sai_bulk_op_error_mode_t mode,
+        _Out_ sai_status_t *object_statuses){
+    STUB_LOG_ENTER();
     STUB_LOG_EXIT();
     return SAI_STATUS_SUCCESS;
 }
@@ -678,5 +721,9 @@ const sai_next_hop_group_api_t next_hop_group_api = {
     stub_set_next_hop_group_attribute,
     stub_get_next_hop_group_attribute,
     stub_add_next_hop_to_group,
-    stub_remove_next_hop_from_group
+    stub_remove_next_hop_from_group,
+    stub_set_next_hop_group_member_attribute,
+    stub_get_next_hop_group_member_attribute,
+    stub_create_next_hop_group_members,
+    stub_remove_next_hop_group_members,
 };

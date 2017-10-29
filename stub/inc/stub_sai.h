@@ -27,7 +27,7 @@
 #include <stdarg.h>
 #include <assert.h>
 
-extern service_method_table_t           g_services;
+extern sai_service_method_table_t           g_services;
 extern const sai_route_api_t            route_api;
 extern const sai_virtual_router_api_t   router_api;
 extern const sai_switch_api_t           switch_api;
@@ -145,13 +145,6 @@ static __attribute__((__used__)) const char *sai_type2str_arr[] = {
     /* SAI_OBJECT_TYPE_MAX = 14 */
 };
 
-typedef union {
-    const sai_fdb_entry_t          * fdb_entry;
-    const sai_neighbor_entry_t     * neighbor_entry;
-    const sai_unicast_route_entry_t* unicast_route_entry;
-    const sai_vlan_id_t              vlan_id;
-    const sai_object_id_t            object_id;
-} sai_object_key_t;
 typedef sai_status_t (*sai_attribute_set_fn)(_In_ const sai_object_key_t *key, _In_ const sai_attribute_value_t *value,
                                              void *arg);
 typedef union {
@@ -248,13 +241,13 @@ void utils_log(const sai_log_level_t severity, const char *module_name, const ch
                   __FILE__, __LINE__, __FUNCTION__, ## arg);            \
     } while (0)
 
-#define STUB_LOG_ENTER()           UTILS_LOG(SAI_LOG_DEBUG, "%s: [\n", __FUNCTION__)
-#define STUB_LOG_EXIT()            UTILS_LOG(SAI_LOG_DEBUG, "%s: ]\n", __FUNCTION__)
-#define STUB_LOG_DBG(fmt, arg ...) UTILS_LOG(SAI_LOG_DEBUG, fmt, ## arg)
-#define STUB_LOG_INF(fmt, arg ...) UTILS_LOG(SAI_LOG_INFO, fmt, ## arg)
-#define STUB_LOG_WRN(fmt, arg ...) UTILS_LOG(SAI_LOG_WARN, fmt, ## arg)
-#define STUB_LOG_ERR(fmt, arg ...) UTILS_LOG(SAI_LOG_ERROR, fmt, ## arg)
-#define STUB_LOG_NTC(fmt, arg ...) UTILS_LOG(SAI_LOG_NOTICE, fmt, ## arg)
+#define STUB_LOG_ENTER()           UTILS_LOG(SAI_LOG_LEVEL_DEBUG, "%s: [\n", __FUNCTION__)
+#define STUB_LOG_EXIT()            UTILS_LOG(SAI_LOG_LEVEL_DEBUG, "%s: ]\n", __FUNCTION__)
+#define STUB_LOG_DBG(fmt, arg ...) UTILS_LOG(SAI_LOG_LEVEL_DEBUG, fmt, ## arg)
+#define STUB_LOG_INF(fmt, arg ...) UTILS_LOG(SAI_LOG_LEVEL_INFO, fmt, ## arg)
+#define STUB_LOG_WRN(fmt, arg ...) UTILS_LOG(SAI_LOG_LEVEL_WARN, fmt, ## arg)
+#define STUB_LOG_ERR(fmt, arg ...) UTILS_LOG(SAI_LOG_LEVEL_ERROR, fmt, ## arg)
+#define STUB_LOG_NTC(fmt, arg ...) UTILS_LOG(SAI_LOG_LEVEL_NOTICE, fmt, ## arg)
 
 #else /* WIN32 */
 
@@ -266,13 +259,13 @@ void utils_log(const sai_log_level_t severity, const char *module_name, const ch
                   __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__);            \
     } while (0)
 
-#define STUB_LOG_ENTER()       UTILS_LOG(SAI_LOG_DEBUG, "%s: [\n", __FUNCTION__)
-#define STUB_LOG_EXIT()        UTILS_LOG(SAI_LOG_DEBUG, "%s: ]\n", __FUNCTION__)
-#define STUB_LOG_DBG(fmt, ...) UTILS_LOG(SAI_LOG_DEBUG, fmt, __VA_ARGS__)
-#define STUB_LOG_INF(fmt, ...) UTILS_LOG(SAI_LOG_INFO, fmt, __VA_ARGS__)
-#define STUB_LOG_WRN(fmt, ...) UTILS_LOG(SAI_LOG_WARN, fmt, __VA_ARGS__)
-#define STUB_LOG_ERR(fmt, ...) UTILS_LOG(SAI_LOG_ERROR, fmt, __VA_ARGS__)
-#define STUB_LOG_NTC(fmt, ...) UTILS_LOG(SAI_LOG_NOTICE, fmt, __VA_ARGS__)
+#define STUB_LOG_ENTER()       UTILS_LOG(SAI_LOG_LEVEL_DEBUG, "%s: [\n", __FUNCTION__)
+#define STUB_LOG_EXIT()        UTILS_LOG(SAI_LOG_LEVEL_DEBUG, "%s: ]\n", __FUNCTION__)
+#define STUB_LOG_DBG(fmt, ...) UTILS_LOG(SAI_LOG_LEVEL_DEBUG, fmt, __VA_ARGS__)
+#define STUB_LOG_INF(fmt, ...) UTILS_LOG(SAI_LOG_LEVEL_INFO, fmt, __VA_ARGS__)
+#define STUB_LOG_WRN(fmt, ...) UTILS_LOG(SAI_LOG_LEVEL_WARN, fmt, __VA_ARGS__)
+#define STUB_LOG_ERR(fmt, ...) UTILS_LOG(SAI_LOG_LEVEL_ERROR, fmt, __VA_ARGS__)
+#define STUB_LOG_NTC(fmt, ...) UTILS_LOG(SAI_LOG_LEVEL_NOTICE, fmt, __VA_ARGS__)
 
 #endif
 
