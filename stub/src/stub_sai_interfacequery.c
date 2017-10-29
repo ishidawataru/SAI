@@ -18,7 +18,7 @@
 #include "sai.h"
 #include "stub_sai.h"
 
-sai_service_method_table_t g_services;
+service_method_table_t g_services;
 bool                   g_initialized = false;
 
 /*
@@ -33,7 +33,7 @@ bool                   g_initialized = false;
  *    SAI_STATUS_SUCCESS on success
  *    Failure status code on error
  */
-sai_status_t sai_api_initialize(_In_ uint64_t flags, _In_ const sai_service_method_table_t* services)
+sai_status_t sai_api_initialize(_In_ uint64_t flags, _In_ const service_method_table_t* services)
 {
     if ((NULL == services) || (NULL == services->profile_get_next_value) || (NULL == services->profile_get_value)) {
         fprintf(stderr, "Invalid services handle passed to SAI API initialize\n");

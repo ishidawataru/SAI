@@ -315,7 +315,7 @@ sai_status_t stub_host_interface_name_get(_In_ const sai_object_key_t   *key,
         return status;
     }
 
-    strncpy(value->chardata, "name", SAI_HOSTIF_NAME_SIZE);
+    strncpy(value->chardata, "name", HOSTIF_NAME_SIZE);
 
     STUB_LOG_EXIT();
     return SAI_STATUS_SUCCESS;

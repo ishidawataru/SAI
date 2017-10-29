@@ -76,14 +76,14 @@ static const sai_vendor_attribute_entry_t fdb_vendor_attribs[] = {
 };
 static void fdb_key_to_str(_In_ const sai_fdb_entry_t* fdb_entry, _Out_ char *key_str)
 {
-    snprintf(key_str, MAX_KEY_STR_LEN, "fdb entry mac [%02x:%02x:%02x:%02x:%02x:%02x] vlan %lu",
+    snprintf(key_str, MAX_KEY_STR_LEN, "fdb entry mac [%02x:%02x:%02x:%02x:%02x:%02x] vlan %u",
              fdb_entry->mac_address[0],
              fdb_entry->mac_address[1],
              fdb_entry->mac_address[2],
              fdb_entry->mac_address[3],
              fdb_entry->mac_address[4],
              fdb_entry->mac_address[5],
-             fdb_entry->bv_id);
+             fdb_entry->vlan_id);
 }
 
 /*
